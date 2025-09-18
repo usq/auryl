@@ -1,0 +1,10 @@
+%import common.DIGIT
+%import common.WS
+%import common.LETTER
+
+%ignore WS
+IDENTIFIER: LETTER (LETTER | DIGIT | "_")*
+
+start:  component*
+component: "comp"  IDENTIFIER "{" content "}"
+content: "abc"

@@ -1,0 +1,10 @@
+load("@auryl_pip//:requirements.bzl", "requirement")
+
+py_binary(
+    name="auryl",
+    srcs=["auryl.py", "parser.py"],
+    data = ["grammar.lark"],
+    deps = [
+        requirement("lark-parser"),
+    ],
+)
