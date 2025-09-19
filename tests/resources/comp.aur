@@ -1,0 +1,36 @@
+package foo.bar;
+
+intf Clock {
+   int tick();
+}
+
+
+bus C1;
+bus C2;
+bus Out;
+
+comp Adder implements Clock {
+    in {
+       int a;
+       int b;
+    }
+
+    out {
+       int c;
+    }
+
+    methods {
+      void m1 [from {a,b}, to {c}]
+      void tick [every 20ms, to {c}]
+    }
+
+    storage {
+       int factor;
+    }
+
+    connect {
+       C1 -> a;
+       C2 -> b;
+       c -> Out
+    }
+}
