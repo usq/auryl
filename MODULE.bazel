@@ -6,12 +6,12 @@ module(
 bazel_dep(name = "rules_python", version = "0.40.0")
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(python_version = "3.11")  # adjust to your desired / installed version
+python.toolchain(python_version = "3.13")  # adjust to your desired / installed version
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
-    hub_name = "auryl_pip",            # <--- required
-    python_version = "3.11",          # <--- required
-    requirements_lock = "//:requirements.in",  # or use requirements / .in/.txt appropriate
+    hub_name = "auryl_pip",  # <--- required
+    python_version = "3.13",  # <--- required
+    requirements_lock = "//:requirements.txt",  # or use requirements / .in/.txt appropriate
 )
 use_repo(pip, "auryl_pip")

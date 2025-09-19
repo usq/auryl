@@ -16,7 +16,6 @@ class Visitor(visitors.Interpreter):
         print(tree)
 
 def parse():
-    system("ls")
     parser = Lark(Path("auryl/grammar.lark").read_text())
     tree = parser.parse("comp Foo {abc}")
     print(Visitor().visit(tree))
