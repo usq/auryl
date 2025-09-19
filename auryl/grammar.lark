@@ -4,7 +4,10 @@
 
 %ignore WS
 IDENTIFIER: LETTER (LETTER | DIGIT | "_")*
+FQN: IDENTIFIER ("." IDENTIFIER)*
 
-start:  component*
-component: "comp"  IDENTIFIER "{" content "}"
-content: "abc"
+
+start: package_decl ";" _package_body
+package_decl: "package" FQN
+_package_body: component*
+component: "comp"  IDENTIFIER "{"  "}"
