@@ -34,6 +34,15 @@ class Node:
     def name(self) -> str:
         return self._name
 
+    def lookup(self, *path:str) -> Optional[Node]:
+        first, rest = path[0], path[1:]
+        if child_entry := self._children_map.get(first):
+            if rest:
+                return child_entry[1].lookup(*rest)
+            return child_entry[1]
+        return None
+
+
     @property
     def children(self) -> List[Node]:
         return self._children[:]
@@ -98,6 +107,15 @@ class Node:
 class RootNode(Node):
     def get_root(self) -> Optional[Node]:
         return self
+
+    def lookup(self, *path:str) -> Optional[Node]:
+        first, rest = path[0], path[1:]
+        if first == self._name:
+            if rest:
+                return super().lookup(*rest)
+            return self
+        return super().lookup(*path)
+
 
     @property
     def is_root(self) -> bool:

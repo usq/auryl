@@ -13,6 +13,6 @@ def test_init(tmpdir):
     comp foo{}
     """)
 
-    parser.parse([testfile])
+    tree = parser.parse([testfile])
 
 

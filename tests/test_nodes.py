@@ -62,3 +62,16 @@ def test_comp_visit_methods_called():
     comp = package.add_child(Component("c"))
     assert root.walk_bf_pre(TestVisitor()).found_component
 
+
+def test_node_lookup():
+    root = RootNode("root")
+    a = root.add_child(Node("a"))
+    b = a.add_child(Node("b"))
+
+    assert root.lookup("root") is root
+    assert root.lookup("root", "a") is a
+    assert root.lookup("root", "a", "b") is b
+
+    assert a.lookup("b") is b
+    assert a.lookup("a") is None
+    assert a.lookup("invalid") is None
