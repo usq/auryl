@@ -22,18 +22,19 @@ comp Adder implements Clock {
        int c;
     }
 
-    methods {
+    func {
       void m1 [from {a,b}, to {c}]
       void tick [every 20ms, to {c}]
     }
 
-    storage {
+    data {
        int factor;
     }
 
+    // Should connect block have different syntax than the rest?
     connect {
-       C1 -> a;
-       C2 -> b;
-       c -> Out
+       C1 -> in.a;
+       C2 -> in.b;
+       out.c -> Out
     }
 }
