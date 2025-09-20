@@ -149,9 +149,20 @@ class Inputs(Node):
     ...
 
 @dataclass
+class Outputs(Node):
+    ...
+
+@dataclass
+class Data(Node):
+    ...
+
+
+@dataclass
 class Component(Node):
     def __post_init__(self) -> None:
         self.add_child(Inputs(_name="in"))
+        self.add_child(Outputs(_name="out"))
+        self.add_child(Data(_name="data"))
 
     def accept(self, visitor: CompVisitor[T]) -> T:
         return visitor.visit_component(self)
@@ -161,10 +172,13 @@ class Component(Node):
 class Input(Node):
     type_: Type
 
-    # def __init__(self, name: str, type_: Type, *args: Any) -> None:
-    #     super().__init__(name, *args)
-    #     self._type = type_
+@dataclass
+class Output(Node):
+    type_: Type
 
+@dataclass
+class Datum(Node):
+    type_: Type
 
 
 class CompTree:

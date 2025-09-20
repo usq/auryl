@@ -28,18 +28,35 @@ def test_full_component(tmpdir):
     testfile.write_text("""
     package bar.biz;
     comp foo{
-       in {
-         a: int;
-       }
+        in {
+          a: int;
+        }
+
+        out {
+          a: int;
+        }
+
+        data {
+          a: int;
+        }
     }
     """)
 
     system = parser.parse([testfile])
     foo = system.root.lookup("bar", "biz", "foo")
     assert foo
-    a = foo.lookup("in", "a")
-    assert a
-    assert isinstance(a, tree.Input)
+    a_in = foo.lookup("in", "a")
+    a_out = foo.lookup("out", "a")
+    a_data = foo.lookup("data", "a")
+    assert a_in
+    assert a_out
+    assert a_data
+    assert isinstance(a_in, tree.Input)
+    assert isinstance(a_out, tree.Output)
+    assert isinstance(a_data, tree.Datum)
+    assert a_in.type_ == tree.Primitive.INT
+    assert a_out.type_ == tree.Primitive.INT
+    assert a_data.type_ == tree.Primitive.INT
 
 
 

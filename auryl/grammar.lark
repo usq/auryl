@@ -23,8 +23,16 @@ _package_body: (component | bus | intf)*
 component: "comp"  IDENTIFIER "{" _component_block* "}"
 
 _component_block: _in_block
+                | _out_block
+                | _data_block
+
 _in_block: "in" "{" input* "}"
+_out_block: "out" "{" output* "}"
+_data_block: "data" "{" datum* "}"
+
 input: IDENTIFIER ":" TYPENAME ";"?
+output: IDENTIFIER ":" TYPENAME ";"?
+datum: IDENTIFIER ":" TYPENAME ";"?
 
 bus: "bus" IDENTIFIER ":" TYPENAME ";"
 

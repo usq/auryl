@@ -15,11 +15,11 @@ intf Clock {
 comp Adder implements Clock {
     in {
        a: int;
-       int b;
+       b: int;
     }
 
     out {
-       int c;
+       c: int;
     }
 
     func {
@@ -28,7 +28,7 @@ comp Adder implements Clock {
     }
 
     data {
-       int factor;
+       factor: int;
     }
 
     // Should connect block have different syntax than the rest?
