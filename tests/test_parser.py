@@ -22,3 +22,26 @@ def test_empty_component(tmpdir):
 
 
 
+def test_full_component(tmpdir):
+    testfile = Path(tmpdir / "file1.aur")
+
+    testfile.write_text("""
+    package bar.biz;
+    comp foo{
+       in {
+         a: int;
+       }
+    }
+    """)
+
+    system = parser.parse([testfile])
+    foo = system.root.lookup("bar", "biz", "foo")
+    assert foo
+    a = foo.lookup("in", "a")
+    assert a
+    assert isinstance(a, tree.Input)
+
+
+
+def test_imports(tmpdir):
+    ...

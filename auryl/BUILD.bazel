@@ -2,7 +2,7 @@ load("@auryl_pip//:requirements.bzl", "requirement")
 
 py_library(
     name="lib",
-    srcs=["auryl.py", "parser.py", "tree.py"],
+    srcs=["auryl.py", "parser.py", "tree.py", "error.py"],
 
     data = ["grammar.lark"],
     deps = [

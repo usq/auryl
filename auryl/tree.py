@@ -1,9 +1,23 @@
 from __future__ import annotations
 from dataclasses import field, dataclass
-from typing import Dict, Generic, List, Optional, Tuple, TypeVar
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar, Union
+from enum import Enum
 
 
 T = TypeVar("T")
+
+class Primitive(Enum):
+    INT = 1
+
+class ComplexRef:
+    def __init__(self, ident:str):
+        self.ident = ident
+
+Type = Union[Primitive, ComplexRef]
+
+
+
+
 
 class CompVisitor(Generic[T]):
     def stop(self):
@@ -23,9 +37,10 @@ class CompVisitor(Generic[T]):
 
 VisitorT = TypeVar("VisitorT", bound=CompVisitor)
 
-@dataclass
+@dataclass(kw_only=True)
 class Node:
     _name: str
+
     _parent: Optional[Node] = None
     _children: List[Node] = field(default_factory=list)
     _children_map: Dict[str, Tuple[int, Node]] = field(default_factory=dict)
@@ -130,13 +145,29 @@ class Package(Node):
         return visitor.visit_package(self)
 
 @dataclass
+class Inputs(Node):
+    ...
+
+@dataclass
 class Component(Node):
+    def __post_init__(self) -> None:
+        self.add_child(Inputs(_name="in"))
+
     def accept(self, visitor: CompVisitor[T]) -> T:
         return visitor.visit_component(self)
+
+
+@dataclass
+class Input(Node):
+    type_: Type
+
+    # def __init__(self, name: str, type_: Type, *args: Any) -> None:
+    #     super().__init__(name, *args)
+    #     self._type = type_
 
 
 
 class CompTree:
     def __init__(self):
-        self.root = RootNode("Root")
+        self.root = RootNode(_name="Root")
 

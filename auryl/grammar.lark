@@ -17,13 +17,14 @@ start: package_decl ";" _package_body
 
 package_decl: "package" FQN
 
-_package_body: (component | struct | bus | intf)*
+_package_body: (component | bus | intf)*
 
 
-component: "comp"  IDENTIFIER "{"  "}"
+component: "comp"  IDENTIFIER "{" _component_block* "}"
 
-struct: "struct" "{" struct_member* "}"
-struct_member: IDENTIFIER ":" TYPENAME ";"
+_component_block: _in_block
+_in_block: "in" "{" input* "}"
+input: IDENTIFIER ":" TYPENAME ";"?
 
 bus: "bus" IDENTIFIER ":" TYPENAME ";"
 
