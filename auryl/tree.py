@@ -1,6 +1,27 @@
 from __future__ import annotations
 from dataclasses import field, dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar
+
+
+T = TypeVar("T")
+
+class CompVisitor(Generic[T]):
+    def stop(self):
+        self._stopped = True
+
+    def visit_node(self, node: Node) -> T:
+        ...
+
+    def visit_root_node(self, root: RootNode) -> T:
+        return self.visit_node(root)
+
+    def visit_package(self, package: Package) -> T:
+        return self.visit_node(package)
+
+    def visit_component(self, component: Component) -> T:
+        return self.visit_node(component)
+
+VisitorT = TypeVar("VisitorT", bound=CompVisitor)
 
 @dataclass
 class Node:
@@ -12,6 +33,10 @@ class Node:
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def children(self) -> List[Node]:
+        return self._children[:]
 
     @name.setter
     def set_name(self, value: str):
@@ -42,10 +67,48 @@ class Node:
     def parent(self) -> Optional[Node]:
         return self._parent
 
+    def accept(self, visitor: CompVisitor[T]) -> T:
+        return visitor.visit_node(self)
+
+    def walk_df_pre(self, visitor: VisitorT) -> VisitorT:
+        to_visit:List[Node] = [self]
+        while(to_visit):
+            c = to_visit.pop()
+            c.accept(visitor)
+            if children_ := c.children:
+                to_visit.extend(reversed(children_))
+
+        return visitor;
+
+    def walk_bf_pre(self, visitor: VisitorT) -> VisitorT:
+        self.accept(visitor)
+        to_visit = self._children[:]
+        while to_visit:
+            c = to_visit.pop(0)
+            c.accept(visitor)
+            to_visit.extend(c.children)
+        return visitor
+
+
 @dataclass
 class RootNode(Node):
     def get_root(self) -> Optional[Node]:
         return self
+
+    def accept(self, visitor: CompVisitor[T]) -> T:
+        return visitor.visit_root_node(self)
+
+@dataclass
+class Package(Node):
+    def accept(self, visitor: CompVisitor[T]) -> T:
+        return visitor.visit_package(self)
+
+@dataclass
+class Component(Node):
+    def accept(self, visitor: CompVisitor[T]) -> T:
+        return visitor.visit_component(self)
+
+
 
 class CompTree:
     def __init__(self):
