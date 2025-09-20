@@ -1,17 +1,20 @@
 package foo.bar;
 
+import "other.aur"
+
+// Some comment
+
+bus C1: biz.R;
+bus C2: int;
+bus Out: int;
+
 intf Clock {
-   int tick();
+   tick(): int;
 }
-
-
-bus C1;
-bus C2;
-bus Out;
 
 comp Adder implements Clock {
     in {
-       int a;
+       a: int;
        int b;
     }
 

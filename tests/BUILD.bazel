@@ -2,7 +2,7 @@ load("@auryl_pip//:requirements.bzl", "requirement")
 
 py_test(
     name="tests",
-    srcs=["tests.py","test_parser.py"],
+    srcs=["tests.py","test_parser.py", "test_nodes.py"],
     deps=[
         "//auryl:lib",
         requirement("pytest")

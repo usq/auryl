@@ -1,13 +1,35 @@
 %import common.DIGIT
 %import common.WS
 %import common.LETTER
+%import common.CPP_COMMENT
+%import common.C_COMMENT
 
 %ignore WS
+
+// comments are ignored for now but should stay
+%ignore CPP_COMMENT
+%ignore C_COMMENT
+
 IDENTIFIER: LETTER (LETTER | DIGIT | "_")*
 FQN: IDENTIFIER ("." IDENTIFIER)*
 
-
 start: package_decl ";" _package_body
+
 package_decl: "package" FQN
-_package_body: component*
+
+_package_body: (component | struct | bus | intf)*
+
+
 component: "comp"  IDENTIFIER "{"  "}"
+
+struct: "struct" "{" struct_member* "}"
+struct_member: IDENTIFIER ":" TYPENAME ";"
+
+bus: "bus" IDENTIFIER ":" TYPENAME ";"
+
+intf: "intf" IDENTIFIER "{" _intf_member "}"
+_intf_member: method_decl
+
+method_decl: IDENTIFIER "(" arg ("," arg)* ")" ":" TYPENAME
+arg: IDENTIFIER ":" TYPENAME
+TYPENAME: IDENTIFIER
