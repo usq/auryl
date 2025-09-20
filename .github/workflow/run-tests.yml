@@ -1,0 +1,19 @@
+name: Run bazel tests
+on:
+  workflow_dispatch:
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup bazel
+        uses: jwlawson/actions-setup-bazel@v2
+        with:
+          bazel-version: '8.4.1'
+      
+      
+      - name: Run bazel tests
+        run: |
+          bazel test //...
