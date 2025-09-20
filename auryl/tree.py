@@ -64,6 +64,10 @@ class Node:
         return self._parent.get_root()
 
     @property
+    def is_root(self) -> bool:
+        return False
+
+    @property
     def parent(self) -> Optional[Node]:
         return self._parent
 
@@ -94,6 +98,10 @@ class Node:
 class RootNode(Node):
     def get_root(self) -> Optional[Node]:
         return self
+
+    @property
+    def is_root(self) -> bool:
+        return True
 
     def accept(self, visitor: CompVisitor[T]) -> T:
         return visitor.visit_root_node(self)

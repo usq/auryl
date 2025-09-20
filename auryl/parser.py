@@ -11,21 +11,15 @@ class Visitor(visitors.Interpreter):
         self.comp_tree = comp_tree
 
     def component(self,tree):
-        print("found component")
-        # self.visit(tree.children[0])
         comp_name, contents = tree.children[0], tree.children[1:]
         for cont in contents:
-
             self.visit(cont)
-        print("tree:", tree)
 
     def content(self, tree):
-        print("Parse content")
-        print(tree)
+        ...
 
 
 def parse(files: Iterable[Path]) -> CompTree:
-
 
     parser = Lark(Path("auryl/grammar.lark").read_text())
 
