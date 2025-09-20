@@ -4,7 +4,7 @@ from auryl import parser,tree
 from pathlib import Path
 
 
-def test_init(tmpdir):
+def test_empty_component(tmpdir):
 
     testfile = Path(tmpdir / "file1.aur")
 
@@ -14,7 +14,11 @@ def test_init(tmpdir):
     """)
 
     system = parser.parse([testfile])
-    package = system.root.lookup("bar")
+    package = system.root.lookup("bar", "biz")
     assert isinstance(package, tree.Package)
+
+    component = package.lookup("foo")
+    assert isinstance(component, tree.Component)
+
 
 

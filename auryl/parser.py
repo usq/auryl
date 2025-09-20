@@ -4,7 +4,7 @@ from pathlib import Path
 
 import lark
 
-from auryl.tree import CompTree, Node, Package
+from auryl.tree import CompTree, Component, Node, Package
 
 
 class ScopeHandler:
@@ -20,6 +20,13 @@ class ScopeHandler:
                 self.current_scope = new_scope
             else:
                 self.current_scope = self.current_scope.add_child(Package(p))
+    def add_new_scope(self, new_scope: Node) -> None:
+        self.current_scope = self.current_scope.add_child(new_scope)
+
+    def pop_scope(self) -> None:
+        new_scope = self.current_scope.parent
+        assert new_scope
+        self.current_scope = new_scope
 
 
 class AstVisitor(visitors.Interpreter):
@@ -30,14 +37,13 @@ class AstVisitor(visitors.Interpreter):
         ident = str(tree.children[0])
         self.scope.enter_package(ident.split("."))
 
-
-    # def component(self,tree):
-    #     comp_name, contents = tree.children[0], tree.children[1:]
-    #     for cont in contents:
-    #         self.visit(cont)
-
-    # def content(self, tree):
-    #     ...
+    def component(self,tree):
+        comp_name, contents = tree.children[0], tree.children[1:]
+        component = Component(comp_name)
+        self.scope.add_new_scope(component)
+        # for cont in contents:
+        #     self.visit(cont)
+        self.scope.pop_scope()
 
 def parse(files: Iterable[Path]) -> CompTree:
 
