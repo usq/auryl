@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 from lark import Lark, visitors
 from pathlib import Path
 
@@ -8,11 +8,17 @@ from auryl.error import TypeNotFoundError
 from auryl.tree import (
     CompTree,
     Component,
+    Runnables,
     Input,
+    InputTrigger,
     Node,
     Output,
     Package,
     Primitive,
+    Ref,
+    Runnable,
+    RunnableOutput,
+    Trigger,
     Type,
     Datum,
 )
@@ -44,6 +50,16 @@ class ScopeHandler:
         if type_name == "int":
             return Primitive.INT
         raise TypeNotFoundError(type_name)
+
+    def lookup(self, *fqn: str) -> Optional[Node]:
+        return self.lookup_in(self.current_scope, *fqn)
+
+    def lookup_in(self, node: Node, *fqn:str) -> Optional[Node]:
+        if new_node := node.lookup(fqn[0]):
+            return node.lookup(*fqn)
+        if p := node.parent:
+            return self.lookup_in(p, *fqn)
+        return None
 
 
 class AstVisitor(visitors.Interpreter):
@@ -85,6 +101,30 @@ class AstVisitor(visitors.Interpreter):
         type_ = self.scope.get_type(str(type_name))
         data.add_child(Datum(_name=str(datum_name), type_=type_))
 
+    def run(self, tree: lark.Tree) -> None:
+        print(tree)
+        runnable_name, children = tree.children[0], tree.children[1:]
+        run = Runnable(_name=runnable_name)
+        self.scope.add_new_scope(run)
+        for c in children:
+            print(c)
+            self.visit(c)
+        self.scope.pop_scope()
+
+    def run_trigger(self, tree: lark.Tree) -> None:
+        print("run_trigger")
+        trigger_name = str(tree.children[0]).split(".")
+        inp = self.scope.lookup(*trigger_name)
+        assert inp
+        trigger = InputTrigger(Ref(to_node=inp))
+        assert isinstance(self.scope.current_scope, Runnable)
+        self.scope.current_scope.trigger.append(trigger)
+
+    def run_output(self, tree: lark.Tree) -> None:
+        output_name = str(tree.children[0]).split(".")
+        out = RunnableOutput()
+        assert isinstance(self.scope.current_scope, Runnable)
+        self.scope.current_scope.output.append(out)
 
 def parse(files: Iterable[Path]) -> CompTree:
 

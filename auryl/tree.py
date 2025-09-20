@@ -1,10 +1,14 @@
 from __future__ import annotations
 from dataclasses import field, dataclass
-from typing import Dict, Generic, List, Optional, Tuple, TypeVar, Union
+from typing import Dict, Generic, List, Optional, Tuple, TypeVar, Union, Sequence
 from enum import Enum
 
 
 T = TypeVar("T")
+
+class Ref(Generic[T]):
+    def __init__(self, *, to_node: Optional[Node], to_ref: Sequence[str] = ()) -> None:
+        self.to = to_node
 
 class Primitive(Enum):
     INT = 1
@@ -14,10 +18,6 @@ class ComplexRef:
         self.ident = ident
 
 Type = Union[Primitive, ComplexRef]
-
-
-
-
 
 class CompVisitor(Generic[T]):
     def stop(self):
@@ -41,9 +41,9 @@ VisitorT = TypeVar("VisitorT", bound=CompVisitor)
 class Node:
     _name: str
 
-    _parent: Optional[Node] = None
+    _parent: Optional[Ref[Node]] = None
     _children: List[Node] = field(default_factory=list)
-    _children_map: Dict[str, Tuple[int, Node]] = field(default_factory=dict)
+    _children_map: Dict[str, Tuple[int, Ref[Node]]] = field(default_factory=dict)
 
     @property
     def name(self) -> str:
@@ -53,8 +53,10 @@ class Node:
         first, rest = path[0], path[1:]
         if child_entry := self._children_map.get(first):
             if rest:
-                return child_entry[1].lookup(*rest)
-            return child_entry[1]
+                node = child_entry[1].to
+                assert node
+                return node.lookup(*rest)
+            return child_entry[1].to
         return None
 
 
@@ -68,11 +70,11 @@ class Node:
 
     def add_child(self, child: Node) -> Node:
         if child.name in self._children_map:
-            if self._children_map[child.name][1] is child:
+            if self._children_map[child.name][1].to is child:
                 raise ValueError(f"Child {child.name} is already child of {self.name}")
             raise ValueError(f"Node {self.name} already has child with name {child.name}, but it's a different node")
         self._children.append(child)
-        self._children_map[child.name] = (len(self._children)-1, child)
+        self._children_map[child.name] = (len(self._children)-1, Ref(to_node=child))
         child._parent = self
         return child
 
@@ -156,6 +158,10 @@ class Outputs(Node):
 class Data(Node):
     ...
 
+@dataclass
+class Runnables(Node):
+    ...
+
 
 @dataclass
 class Component(Node):
@@ -163,6 +169,7 @@ class Component(Node):
         self.add_child(Inputs(_name="in"))
         self.add_child(Outputs(_name="out"))
         self.add_child(Data(_name="data"))
+        self.add_child(Runnables(_name="run"))
 
     def accept(self, visitor: CompVisitor[T]) -> T:
         return visitor.visit_component(self)
@@ -180,6 +187,23 @@ class Output(Node):
 class Datum(Node):
     type_: Type
 
+@dataclass
+class Runnable(Node):
+    trigger: List[Trigger] = field(default_factory=list)
+    output: List[RunnableOutput] = field(default_factory=list)
+
+@dataclass
+class Trigger:
+    ...
+
+@dataclass
+class InputTrigger(Trigger):
+    triggered_by: Ref[Input]
+
+
+@dataclass
+class RunnableOutput:
+    ...
 
 class CompTree:
     def __init__(self):

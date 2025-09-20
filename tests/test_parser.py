@@ -39,6 +39,10 @@ def test_full_component(tmpdir):
         data {
           a: int;
         }
+
+        run {
+          process [on in.a; to out.a];
+        }
     }
     """)
 
@@ -59,6 +63,12 @@ def test_full_component(tmpdir):
     assert a_data.type_ == tree.Primitive.INT
 
 
+    runnables = foo.lookup("run")
+    assert runnables
+    print(runnables)
+    print(foo.children)
+    proc = runnables.lookup("process")
+    assert proc
 
 def test_imports(tmpdir):
     ...
