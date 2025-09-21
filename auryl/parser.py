@@ -128,7 +128,9 @@ class AstVisitor(visitors.Interpreter):
 
     def run_output(self, tree: lark.Tree) -> None:
         output_name = str(tree.children[0]).split(".")
-        out = RunnableOutput()
+        out_node = self.scope.lookup(*output_name)
+
+        out = RunnableOutput(write_to=Ref(to_node=out_node))
         assert isinstance(self.scope.current_scope, Runnable)
         self.scope.current_scope.output.append(out)
 

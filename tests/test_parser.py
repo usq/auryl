@@ -66,6 +66,14 @@ def test_full_component(tmpdir):
     process = foo.lookup("run", "process")
     assert isinstance(process, tree.Runnable)
     assert process
+    assert process.trigger
+    assert isinstance(process.trigger[0], tree.InputTrigger)
+    assert process.trigger[0].triggered_by.to is a_in
+    assert process.output
+
+    assert isinstance(process.output[0], tree.RunnableOutput)
+    assert process.output[0].write_to.to is a_out
+
 
 def test_imports(tmpdir):
     ...

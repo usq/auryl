@@ -204,7 +204,7 @@ class InputTrigger(Trigger):
 
 @dataclass
 class RunnableOutput:
-    ...
+    write_to: Ref[Output]
 
 class CompTree:
     def __init__(self):
