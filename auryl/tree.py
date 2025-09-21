@@ -75,7 +75,7 @@ class Node:
             raise ValueError(f"Node {self.name} already has child with name {child.name}, but it's a different node")
         self._children.append(child)
         self._children_map[child.name] = (len(self._children)-1, Ref(to_node=child))
-        child._parent = self
+        child._parent = Ref(to_node=self)
         return child
 
     def remove_child(self, child_name: str) -> Node:
@@ -87,7 +87,7 @@ class Node:
     def get_root(self) -> Optional[Node]:
         if self._parent is None:
             return None
-        return self._parent.get_root()
+        return self._parent.to.get_root()
 
     @property
     def is_root(self) -> bool:
@@ -95,7 +95,9 @@ class Node:
 
     @property
     def parent(self) -> Optional[Node]:
-        return self._parent
+        if self._parent:
+            return self._parent.to
+        return None
 
     def accept(self, visitor: CompVisitor[T]) -> T:
         return visitor.visit_node(self)
@@ -169,7 +171,6 @@ class Component(Node):
         self.add_child(Inputs(_name="in"))
         self.add_child(Outputs(_name="out"))
         self.add_child(Data(_name="data"))
-        self.add_child(Runnables(_name="run"))
 
     def accept(self, visitor: CompVisitor[T]) -> T:
         return visitor.visit_component(self)

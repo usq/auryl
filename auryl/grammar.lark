@@ -25,12 +25,12 @@ component: "comp"  IDENTIFIER "{" _component_block* "}"
 _component_block: _in_block
                 | _out_block
                 | _data_block
-                | _run_block
+                | runnables
 
 _in_block: "in" "{" input* "}"
 _out_block: "out" "{" output* "}"
 _data_block: "data" "{" datum* "}"
-_run_block: "run" "{" run* "}"
+runnables: "run" "{" run* "}"
 
 input: IDENTIFIER ":" TYPENAME ";"?
 output: IDENTIFIER ":" TYPENAME ";"?

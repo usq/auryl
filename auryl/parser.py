@@ -101,18 +101,24 @@ class AstVisitor(visitors.Interpreter):
         type_ = self.scope.get_type(str(type_name))
         data.add_child(Datum(_name=str(datum_name), type_=type_))
 
+    def runnables(self, tree: lark.Tree) -> None:
+        self.scope.add_new_scope(Runnables(_name="run"))
+        for c in tree.children:
+            self.visit(c)
+        self.scope.pop_scope()
+
+
     def run(self, tree: lark.Tree) -> None:
-        print(tree)
         runnable_name, children = tree.children[0], tree.children[1:]
+        print("parsing run named", runnable_name)
         run = Runnable(_name=runnable_name)
         self.scope.add_new_scope(run)
+        print(f"Runnabel parent is now: {run.parent}")
         for c in children:
-            print(c)
             self.visit(c)
         self.scope.pop_scope()
 
     def run_trigger(self, tree: lark.Tree) -> None:
-        print("run_trigger")
         trigger_name = str(tree.children[0]).split(".")
         inp = self.scope.lookup(*trigger_name)
         assert inp

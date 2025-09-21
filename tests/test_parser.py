@@ -63,12 +63,9 @@ def test_full_component(tmpdir):
     assert a_data.type_ == tree.Primitive.INT
 
 
-    runnables = foo.lookup("run")
-    assert runnables
-    print(runnables)
-    print(foo.children)
-    proc = runnables.lookup("process")
-    assert proc
+    process = foo.lookup("run", "process")
+    assert isinstance(process, tree.Runnable)
+    assert process
 
 def test_imports(tmpdir):
     ...
